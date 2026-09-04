@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feliz Cumpleaños</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-color: #f7ede2;
+      --card-bg: #fdfbf7;
+      --accent: #d4a373;
+      --btn-color: #bc6c25;
+      --text-dark: #4a3b32;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      font-family: 'Montserrat', sans-serif;
+      color: var(--text-dark);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 20px 15px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 25px;
+    }
+
+    h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2.2rem;
+      color: #8b5e34;
+      margin-top: 10px;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #9c8473;
+    }
+
+    /* Estilo Polaroid */
+    .polaroid {
+      background-color: white;
+      padding: 15px 15px 25px 15px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      border-radius: 4px;
+      width: 100%;
+      transform: rotate(-1deg);
+    }
+
+    .polaroid img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+      border-radius: 2px;
+    }
+
+    .polaroid-footer {
+      margin-top: 12px;
+      font-size: 1.2rem;
+      color: #8b5e34;
+    }
+
+    /* Animación del Sobre y Carta */
+    .envelope-wrapper {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .envelope {
+      background-color: #e6ccb2;
+      border-radius: 8px;
+      padding: 25px 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .seal {
+      width: 80px;
+      height: 80px;
+      background-color: #a44a3f;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: bold;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      margin-bottom: 8px;
+    }
+
+    .envelope-text {
+      font-size: 0.9rem;
+      color: #6b523e;
+      font-weight: 500;
+    }
+
+    /* Carta Oculta */
+    .letter {
+      max-height: 0;
+      overflow: hidden;
+      background-color: #fff9f2;
+      border: 1px solid #e0d0c1;
+      border-radius: 8px;
+      padding: 0 20px;
+      transition: max-height 0.8s ease, padding 0.5s ease, margin 0.5s ease;
+      text-align: left;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    .letter.open {
+      max-height: 600px;
+      padding: 25px 20px;
+      margin-top: 15px;
+    }
+
+    .letter p {
+      margin-bottom: 12px;
+    }
+
+    .toast-icon {
+      font-size: 1.8rem;
+      margin-bottom: 5px;
+    }
+
+    /* Botón final */
+    .btn-save {
+      background-color: var(--btn-color);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(188, 108, 37, 0.3);
+      transition: transform 0.2s;
+      margin-top: 10px;
+    }
+
+    .btn-save:active {
+      transform: scale(0.96);
+    }
+
+    footer {
+      font-size: 0.7rem;
+      color: #a89f91;
+      letter-spacing: 1px;
+      margin-top: 15px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div>
+      <h1>Hoy es el cumpleaños de mi persona favorita</h1>
+      <p class="subtitle">6 de Septiembre</p>
+    </div>
+
+    <!-- Foto Polaroid -->
+    <div class="polaroid">
+      <!-- Cambia la URL por tu foto real -->
+      <img src="https://picsum.photos/400/400" alt="Nuestra foto">
+      <div class="polaroid-footer">✨ 🎈 ✨</div>
+    </div>
+
+    <!-- Sobre Interactivo -->
+    <div class="envelope-wrapper">
+      <div class="envelope" id="envelopeBtn">
+        <div class="seal">Presioname</div>
+        <div class="envelope-text">Descúbrelo</div>
+      </div>
+
+      <!-- Contenido de la carta -->
+      <div class="letter" id="letterContent">
+        <p>🎈 🎂 🎈</p>
+        <p>Hay personas que llegan y lo cambian todo.</p>
+        <p>Pienso que ni el destino escribiendo la mejor de las historias habría creado a alguien tan especial como tú.</p>
+        <p>Hoy celebro tu risa, tu luz y tu forma de hacerme sentir en casa.</p>
+        <p>Que la vida te siga mostrando que no hay nada más bonito que compartirla juntos.</p>
+      </div>
+    </div>
+
+    <!-- Segunda Foto / Cierre -->
+    <div class="toast-icon">👩🏻‍🤝‍🧑🏻💞</div>
+    <p style="font-style: italic; font-size: 0.95rem;">Por muchos cumpleaños más a tu lado</p>
+ 
+    <div class="polaroid" style="transform: rotate(1deg);">
+      <!-- Cambia la URL por tu segunda foto -->
+      <img src="https://picsum.photos/400/401" alt="Foto juntos">
+    </div>
+
+    <p style="font-size: 0.9rem;">Gracias por compartir tu vida conmigo</p>
+
+    <button class="btn-save" onclick="alert('❤️ ¡Guardado en el corazón!')">Guardar este momento</button>
+
+    <footer>Bárbara & Tomás por siempre💘  </footer>
+
+  </div>
+
+  <script>
+    // Lógica para abrir/cerrar el sobre
+    const envelopeBtn = document.getElementById('envelopeBtn');
+    const letterContent = document.getElementById('letterContent');
+
+    envelopeBtn.addEventListener('click', () => {
+      letterContent.classList.toggle('open');
+      if (letterContent.classList.contains('open')) {
+        envelopeBtn.querySelector('.envelope-text').textContent = 'Ocultar carta';
+      } else {
+        envelopeBtn.querySelector('.envelope-text').textContent = 'Descúbrelo';
+      }
+    });
+  </script>
+</body>
+</html>
