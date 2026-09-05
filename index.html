@@ -8,6 +8,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
   
+  <!-- Librería externa para el efecto de confeti/serpentinas -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
   <style>
     :root {
       --bg-color: #f7ede2;
@@ -34,6 +37,7 @@
       align-items: flex-start;
       min-height: 100vh;
       padding: 20px 15px;
+      overflow-x: hidden;
     }
 
     .container {
@@ -84,7 +88,7 @@
       color: #8b5e34;
     }
 
-    /* === ANIMACIÓN Y ESTRUCTURA DEL SOBRE === */
+    /* === ANIMACIÓN SOBRE 3D === */
     .envelope-wrapper {
       position: relative;
       width: 320px;
@@ -103,7 +107,6 @@
       cursor: pointer;
     }
 
-    /* Solapa superior que rota (abrir) */
     .envelope::before {
       content: "";
       position: absolute;
@@ -119,7 +122,6 @@
       z-index: 3;
     }
 
-    /* Solapas inferiores */
     .envelope-pocket {
       position: absolute;
       bottom: 0;
@@ -135,7 +137,6 @@
       z-index: 2;
     }
 
-    /* Sello o botón circular central */
     .seal {
       position: absolute;
       top: 75px;
@@ -163,18 +164,24 @@
       font-weight: normal;
     }
 
-    /* Carta deslizable */
+    /* Carta con efecto Papel Fotográfico Brillante */
     .letter {
       position: absolute;
       left: 10px;
       bottom: 10px;
       width: 300px;
       height: 180px;
-      background-color: #fff9f2;
-      border: 1px solid #e0d0c1;
+      background: 
+        linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 40%),
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.8) 0%, rgba(255,249,242,0) 60%),
+        #fffdfa;
+      border: 1px solid rgba(255, 255, 255, 0.8);
       border-radius: 6px;
       padding: 15px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: 
+        0 2px 8px rgba(0,0,0,0.1),
+        inset 0 1px 2px rgba(255, 255, 255, 0.9),
+        inset 0 -1px 2px rgba(0, 0, 0, 0.03);
       transition: transform 0.6s ease, height 0.6s ease, z-index 0.1s ease;
       z-index: 1;
       overflow: hidden;
@@ -183,7 +190,6 @@
       text-align: left;
     }
 
-    /* Animación de apertura al hacer clic */
     .envelope.open::before {
       transform: rotateX(180deg);
       z-index: 1;
@@ -200,7 +206,10 @@
       height: auto;
       min-height: 340px;
       z-index: 3;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+      box-shadow: 
+        0 12px 28px rgba(0, 0, 0, 0.15),
+        inset 0 1px 3px rgba(255, 255, 255, 1),
+        0 0 15px rgba(255, 255, 255, 0.5);
       transition: transform 0.6s ease 0.4s, height 0.6s ease 0.4s, z-index 0.1s ease 0.4s;
       overflow: visible;
     }
@@ -211,7 +220,7 @@
 
     .toast-icon {
       font-size: 1.8rem;
-      margin-top: 120px; /* Margen para recibir la carta cuando sube */
+      margin-top: 120px;
       transition: margin-top 0.6s ease;
     }
 
@@ -219,7 +228,6 @@
       margin-top: 220px;
     }
 
-    /* Botón final */
     .btn-save {
       background-color: var(--btn-color);
       color: white;
@@ -244,6 +252,29 @@
       margin-top: 15px;
       margin-bottom: 20px;
     }
+
+    /* === ANIMACIÓN DE GLOBOS QUE SUBEN === */
+    .balloon {
+      position: fixed;
+      bottom: -100px;
+      opacity: 0.85;
+      font-size: 2.2rem;
+      user-select: none;
+      pointer-events: none;
+      z-index: 9999;
+      animation: floatUp 4s ease-in forwards;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-110vh) rotate(20deg);
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 <body>
@@ -254,13 +285,13 @@
       <p class="subtitle">6 de Septiembre</p>
     </div>
 
-    <!-- Foto Polaroid -->
+    <!-- Primera Foto -->
     <div class="polaroid">
       <img src="https://i.imgur.com/kV8E2pj.jpg" alt="Nuestra foto">
       <div class="polaroid-footer">✨ 🎈 ✨</div>
     </div>
 
-    <!-- Sobre Interactivo con Animación 3D -->
+    <!-- Sobre Interactivo -->
     <div class="envelope-wrapper">
       <div class="envelope" id="envelopeBtn">
         <div class="seal">
@@ -269,7 +300,7 @@
         </div>
         <div class="envelope-pocket"></div>
         
-        <!-- Contenido de la carta -->
+        <!-- Carta -->
         <div class="letter" id="letterContent">
           <p style="text-align: center;">🎈 🎂 🎈</p>
           <p>Hay personas que llegan y lo cambian todo.</p>
@@ -283,7 +314,7 @@
       </div>
     </div>
 
-    <!-- Segunda Foto / Cierre -->
+    <!-- Cierre -->
     <div class="toast-icon">👩🏻💞🧑🏻</div>
     <p style="font-style: italic; font-size: 0.95rem;">Por muchos cumpleaños más a tu lado</p>
 
@@ -302,9 +333,48 @@
     const envelopeBtn = document.getElementById('envelopeBtn');
     const mainContainer = document.getElementById('mainContainer');
 
+    // Función para lanzar ráfaga de confeti/serpentinas
+    function launchConfetti() {
+      // Ráfaga desde la izquierda y derecha
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6, x: 0.2 }
+      });
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6, x: 0.8 }
+      });
+    }
+
+    // Función para elevar globos
+    function launchBalloons() {
+      const balloons = ['🎈', '💖', '🎉', '✨', '🎈'];
+      for (let i = 0; i < 15; i++) {
+        setTimeout(() => {
+          const balloon = document.createElement('div');
+          balloon.className = 'balloon';
+          balloon.innerText = balloons[Math.floor(Math.random() * balloons.length)];
+          balloon.style.left = Math.random() * 85 + 5 + 'vw';
+          balloon.style.animationDuration = (3.5 + Math.random() * 2) + 's';
+          document.body.appendChild(balloon);
+
+          // Limpiar elemento después de la animación
+          setTimeout(() => balloon.remove(), 6000);
+        }, i * 250);
+      }
+    }
+
     envelopeBtn.addEventListener('click', () => {
-      envelopeBtn.classList.toggle('open');
+      const isOpen = envelopeBtn.classList.toggle('open');
       mainContainer.classList.toggle('expanded');
+
+      // Si se acaba de abrir, lanzamos las animaciones de fiesta
+      if (isOpen) {
+        setTimeout(launchConfetti, 400);
+        setTimeout(launchBalloons, 500);
+      }
     });
   </script>
 </body>
