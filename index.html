@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
   
-  <!-- Librería externa para el efecto de confeti/serpentinas -->
+  <!-- Librería para el efecto de confeti/serpentinas -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <style>
@@ -64,26 +64,70 @@
       color: #9c8473;
     }
 
-    /* Estilo Polaroid */
+    /* Estilo Polaroid Base */
     .polaroid {
       background-color: white;
-      padding: 15px 15px 25px 15px;
+      padding: 15px 15px 20px 15px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.08);
       border-radius: 4px;
       width: 100%;
       transform: rotate(-1deg);
+      position: relative;
     }
 
-    .polaroid img {
+    /* === CARRUSEL DE DESLIZAMIENTO === */
+    .carousel-container {
+      position: relative;
       width: 100%;
+      overflow: hidden;
+      border-radius: 2px;
+    }
+
+    .carousel-track {
+      display: flex;
+      transition: transform 0.4s ease-in-out;
+      width: 100%;
+    }
+
+    .carousel-track img {
+      width: 100%;
+      flex-shrink: 0;
       height: auto;
       aspect-ratio: 1320 / 2346;
       object-fit: cover;
       border-radius: 2px;
     }
 
-    .polaroid-footer {
+    /* Indicadores de deslizar (puntos) */
+    .carousel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
       margin-top: 12px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      background-color: #d4a373;
+      border-radius: 50%;
+      opacity: 0.4;
+      transition: opacity 0.3s, transform 0.3s;
+    }
+
+    .dot.active {
+      opacity: 1;
+      transform: scale(1.2);
+    }
+
+    .swipe-hint {
+      font-size: 0.75rem;
+      color: #a89f91;
+      margin-top: 4px;
+    }
+
+    .polaroid-footer {
+      margin-top: 8px;
       font-size: 1.2rem;
       color: #8b5e34;
     }
@@ -164,7 +208,7 @@
       font-weight: normal;
     }
 
-    /* Carta con efecto Papel Fotográfico Brillante */
+    /* Carta estilo Papel Fotográfico */
     .letter {
       position: absolute;
       left: 10px;
@@ -253,7 +297,7 @@
       margin-bottom: 20px;
     }
 
-    /* === ANIMACIÓN DE GLOBOS QUE SUBEN === */
+    /* Animación Globos */
     .balloon {
       position: fixed;
       bottom: -100px;
@@ -285,9 +329,25 @@
       <p class="subtitle">6 de Septiembre</p>
     </div>
 
-    <!-- Primera Foto -->
+    <!-- Primera Polaroid con Carrusel de 3 fotos -->
     <div class="polaroid">
-      <img src="https://i.imgur.com/kV8E2pj.jpg" alt="Nuestra foto">
+      <div class="carousel-container" id="carousel">
+        <div class="carousel-track" id="track">
+          <!-- Cambia las URLs por tus fotos reales -->
+          <img src="https://i.imgur.com/kV8E2pj.jpg" alt="Foto 1">
+          <img src="https://picsum.photos/1320/2346?random=1" alt="Foto 2">
+          <img src="https://picsum.photos/1320/2346?random=2" alt="Foto 3">
+        </div>
+      </div>
+      
+      <!-- Indicadores de puntos -->
+      <div class="carousel-dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+      <p class="swipe-hint">👈 Desliza para ver más fotos 👉</p>
+
       <div class="polaroid-footer">✨ 🎈 ✨</div>
     </div>
 
@@ -330,25 +390,58 @@
   </div>
 
   <script>
-    const envelopeBtn = document.getElementById('envelopeBtn');
-    const mainContainer = document.getElementById('mainContainer');
+    // --- LÓGICA DEL CARRUSEL DE FOTOS ---
+    const carousel = document.getElementById('carousel');
+    const track = document.getElementById('track');
+    const dots = document.querySelectorAll('.dot');
+    let currentIndex = 0;
+    let startX = 0;
+    let currentTranslate = 0;
+    let prevTranslate = 0;
 
-    // Función para lanzar ráfaga de confeti/serpentinas
-    function launchConfetti() {
-      // Ráfaga desde la izquierda y derecha
-      confetti({
-        particleCount: 80,
-        spread: 70,
-        origin: { y: 0.6, x: 0.2 }
-      });
-      confetti({
-        particleCount: 80,
-        spread: 70,
-        origin: { y: 0.6, x: 0.8 }
+    function updateCarousel() {
+      track.style.transform = `translateX(-${currentIndex * 100}%)`;
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentIndex);
       });
     }
 
-    // Función para elevar globos
+    // Eventos de táctil (Mobile)
+    carousel.addEventListener('touchstart', e => {
+      startX = e.touches[0].clientX;
+    });
+
+    carousel.addEventListener('touchend', e => {
+      const endX = e.changedTouches[0].clientX;
+      const diffX = startX - endX;
+
+      if (Math.abs(diffX) > 40) { // Sensibilidad del gesto
+        if (diffX > 0 && currentIndex < 2) {
+          currentIndex++;
+        } else if (diffX < 0 && currentIndex > 0) {
+          currentIndex--;
+        }
+        updateCarousel();
+      }
+    });
+
+    // Permitir hacer clic en las fotos o puntos para avanzar
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        currentIndex = index;
+        updateCarousel();
+      });
+    });
+
+    // --- LÓGICA SOBRE Y ANIMACIONES ---
+    const envelopeBtn = document.getElementById('envelopeBtn');
+    const mainContainer = document.getElementById('mainContainer');
+
+    function launchConfetti() {
+      confetti({ particleCount: 80, spread: 70, origin: { y: 0.6, x: 0.2 } });
+      confetti({ particleCount: 80, spread: 70, origin: { y: 0.6, x: 0.8 } });
+    }
+
     function launchBalloons() {
       const balloons = ['🎈', '💖', '🎉', '✨', '🎈'];
       for (let i = 0; i < 15; i++) {
@@ -359,8 +452,6 @@
           balloon.style.left = Math.random() * 85 + 5 + 'vw';
           balloon.style.animationDuration = (3.5 + Math.random() * 2) + 's';
           document.body.appendChild(balloon);
-
-          // Limpiar elemento después de la animación
           setTimeout(() => balloon.remove(), 6000);
         }, i * 250);
       }
@@ -370,7 +461,6 @@
       const isOpen = envelopeBtn.classList.toggle('open');
       mainContainer.classList.toggle('expanded');
 
-      // Si se acaba de abrir, lanzamos las animaciones de fiesta
       if (isOpen) {
         setTimeout(launchConfetti, 400);
         setTimeout(launchBalloons, 500);
