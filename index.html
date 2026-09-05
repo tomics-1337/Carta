@@ -15,6 +15,8 @@
       --accent: #d4a373;
       --btn-color: #bc6c25;
       --text-dark: #4a3b32;
+      --envelope-color: #e6ccb2;
+      --envelope-dark: #d8b28c;
     }
 
     * {
@@ -82,74 +84,139 @@
       color: #8b5e34;
     }
 
-    /* Animación del Sobre y Carta */
+    /* === ANIMACIÓN Y ESTRUCTURA DEL SOBRE === */
     .envelope-wrapper {
-      width: 100%;
-      margin-top: 10px;
+      position: relative;
+      width: 320px;
+      height: 200px;
+      margin: 30px auto 20px auto;
     }
 
     .envelope {
-      background-color: #e6ccb2;
-      border-radius: 8px;
-      padding: 25px 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-      cursor: pointer;
       position: relative;
-      transition: all 0.3s ease;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      width: 100%;
+      height: 100%;
+      background-color: var(--envelope-dark);
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      cursor: pointer;
     }
 
+    /* Solapa superior que rota (abrir) */
+    .envelope::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 0;
+      border-left: 160px solid transparent;
+      border-right: 160px solid transparent;
+      border-top: 110px solid var(--envelope-color);
+      transform-origin: top;
+      transition: transform 0.5s ease 0.5s, z-index 0.2s ease 0.5s;
+      z-index: 3;
+    }
+
+    /* Solapas inferiores */
+    .envelope-pocket {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 0;
+      border-left: 160px solid var(--envelope-color);
+      border-right: 160px solid var(--envelope-color);
+      border-bottom: 100px solid var(--envelope-color);
+      border-top: 100px solid transparent;
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+      z-index: 2;
+    }
+
+    /* Sello o botón circular central */
     .seal {
-      width: 80px;
-      height: 80px;
+      position: absolute;
+      top: 75px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 75px;
+      height: 75px;
       background-color: #a44a3f;
       border-radius: 50%;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       color: white;
       font-size: 0.75rem;
       font-weight: bold;
       box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-      margin-bottom: 8px;
+      z-index: 4;
+      transition: opacity 0.3s ease;
     }
 
-    .envelope-text {
-      font-size: 0.9rem;
-      color: #6b523e;
-      font-weight: 500;
+    .seal-subtext {
+      font-size: 0.65rem;
+      opacity: 0.8;
+      font-weight: normal;
     }
 
-    /* Carta Oculta */
+    /* Carta deslizable */
     .letter {
-      max-height: 0;
-      overflow: hidden;
+      position: absolute;
+      left: 10px;
+      bottom: 10px;
+      width: 300px;
+      height: 180px;
       background-color: #fff9f2;
       border: 1px solid #e0d0c1;
-      border-radius: 8px;
-      padding: 0 20px;
-      transition: max-height 0.8s ease, padding 0.5s ease, margin 0.5s ease;
+      border-radius: 6px;
+      padding: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.6s ease, height 0.6s ease, z-index 0.1s ease;
+      z-index: 1;
+      overflow: hidden;
+      font-size: 0.9rem;
+      line-height: 1.5;
       text-align: left;
-      font-size: 0.95rem;
-      line-height: 1.6;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     }
 
-    .letter.open {
-      max-height: 600px;
-      padding: 25px 20px;
-      margin-top: 15px;
+    /* Animación de apertura al hacer clic */
+    .envelope.open::before {
+      transform: rotateX(180deg);
+      z-index: 1;
+      transition: transform 0.5s ease, z-index 0.2s ease 0.3s;
+    }
+
+    .envelope.open .seal {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .envelope.open .letter {
+      transform: translateY(-160px);
+      height: auto;
+      min-height: 340px;
+      z-index: 3;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+      transition: transform 0.6s ease 0.4s, height 0.6s ease 0.4s, z-index 0.1s ease 0.4s;
+      overflow: visible;
     }
 
     .letter p {
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .toast-icon {
       font-size: 1.8rem;
-      margin-bottom: 5px;
+      margin-top: 120px; /* Margen para recibir la carta cuando sube */
+      transition: margin-top 0.6s ease;
+    }
+
+    .container.expanded .toast-icon {
+      margin-top: 220px;
     }
 
     /* Botón final */
@@ -164,7 +231,6 @@
       cursor: pointer;
       box-shadow: 0 4px 10px rgba(188, 108, 37, 0.3);
       transition: transform 0.2s;
-      margin-top: 10px;
     }
 
     .btn-save:active {
@@ -182,7 +248,7 @@
 </head>
 <body>
 
-  <div class="container">
+  <div class="container" id="mainContainer">
     <div>
       <h1>Hoy está de cumpleaños de mi persona favorita!</h1>
       <p class="subtitle">6 de Septiembre</p>
@@ -190,37 +256,38 @@
 
     <!-- Foto Polaroid -->
     <div class="polaroid">
-      <!-- Cambia la URL por tu foto real -->
       <img src="https://i.imgur.com/kV8E2pj.jpg" alt="Nuestra foto">
       <div class="polaroid-footer">✨ 🎈 ✨</div>
     </div>
 
-    <!-- Sobre Interactivo -->
+    <!-- Sobre Interactivo con Animación 3D -->
     <div class="envelope-wrapper">
       <div class="envelope" id="envelopeBtn">
-        <div class="seal">Presioname</div>
-        <div class="envelope-text">Descúbrelo</div>
-      </div>
-
-      <!-- Contenido de la carta -->
-      <div class="letter" id="letterContent">
-        <p> <center> 🎈 🎂 🎈 </center>
-        <p>Hay personas que llegan y lo cambian todo.</p>
-        <p>Y tu en mi vida eres una de ellas, le doy gracias al destino por poner en mi camino a una personita como tú.</p>
-        <p>Hoy celebro tu risa, tu luz, tu amor y tu forma de hacerme sentir en casa.</p>
-        <p>Que la vida te siga mostrando que no hay nada más bonito que compartirla juntos.</p>
-        <p>A pesar de los altos y bajos, quiero que sepas que siempre estare contigo, eres una persona unica y especial</p>
-        <p>De hecho eres MI PERSONA ESPECIAL, te amo mi princesita💘</p>
-        <p> <center>Feliz Cumpleaños mi amor🎁🎈</center></p>
+        <div class="seal">
+          <span>Presioname</span>
+          <span class="seal-subtext">Descúbrelo</span>
+        </div>
+        <div class="envelope-pocket"></div>
+        
+        <!-- Contenido de la carta -->
+        <div class="letter" id="letterContent">
+          <p style="text-align: center;">🎈 🎂 🎈</p>
+          <p>Hay personas que llegan y lo cambian todo.</p>
+          <p>Y tú en mi vida eres una de ellas, le doy gracias al destino por poner en mi camino a una personita como tú.</p>
+          <p>Hoy celebro tu risa, tu luz, tu amor y tu forma de hacerme sentir en casa.</p>
+          <p>Que la vida te siga mostrando que no hay nada más bonito que compartirla juntos.</p>
+          <p>A pesar de los altos y bajos, quiero que sepas que siempre estaré contigo, eres una persona única y especial.</p>
+          <p>De hecho eres <b>MI PERSONA ESPECIAL</b>, te amo mi princesita💘</p>
+          <p style="text-align: center; margin-top: 15px;"><b>Feliz Cumpleaños mi amor🎁🎈</b></p>
+        </div>
       </div>
     </div>
 
     <!-- Segunda Foto / Cierre -->
     <div class="toast-icon">👩🏻💞🧑🏻</div>
     <p style="font-style: italic; font-size: 0.95rem;">Por muchos cumpleaños más a tu lado</p>
- 
+
     <div class="polaroid" style="transform: rotate(1deg);">
-      <!-- Cambia la URL por tu segunda foto -->
       <img src="https://i.imgur.com/zjOCFqH.jpg" alt="Foto juntos">
     </div>
 
@@ -228,22 +295,16 @@
 
     <button class="btn-save" onclick="alert('❤️ ¡Guardado en el corazón!')">Guardar este momento</button>
 
-    <footer>Bárbara & Tomás por siempre💘  </footer>
-
+    <footer>Bárbara & Tomás por siempre💘</footer>
   </div>
 
   <script>
-    // Lógica para abrir/cerrar el sobre
     const envelopeBtn = document.getElementById('envelopeBtn');
-    const letterContent = document.getElementById('letterContent');
+    const mainContainer = document.getElementById('mainContainer');
 
     envelopeBtn.addEventListener('click', () => {
-      letterContent.classList.toggle('open');
-      if (letterContent.classList.contains('open')) {
-        envelopeBtn.querySelector('.envelope-text').textContent = 'Ocultar carta';
-      } else {
-        envelopeBtn.querySelector('.envelope-text').textContent = 'Descúbrelo';
-      }
+      envelopeBtn.classList.toggle('open');
+      mainContainer.classList.toggle('expanded');
     });
   </script>
 </body>
